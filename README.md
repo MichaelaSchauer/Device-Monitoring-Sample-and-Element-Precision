@@ -17,7 +17,7 @@ The methodology is discussed in more detail in **Schauer 2026**. The script uses
 
 If you use this workflow, please cite:
 
-**Schauer, M. (2026), Device Monitoring, Sample and Element Precision for Analytical Data in handheld pXRF studies - Evaluation in R. Supplementary Material to Schauer 2026.**
+**Schauer, M. (2026). Device monitoring, sample and element precision for analytical data in handheld pXRF studies: Evaluation in R. Supplementary material to Schauer (2026). Version 1.0. Zenodo. https://doi.org/10.5281/zenodo.18442146**
 
 ---
 
