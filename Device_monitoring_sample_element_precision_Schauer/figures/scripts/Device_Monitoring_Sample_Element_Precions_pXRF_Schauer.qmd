@@ -1,0 +1,1654 @@
+---
+title: "Device Monitoring, Sample and Element Precision for Analytical Data in handheld pXRF studies - Evaluation in R"
+subtitle: "Supplementary Material to Schauer 2026"
+title-block-banner: true
+author: 
+  name: Michaela Schauer
+  orcid: 0000-0001-7514-7187
+  affiliations:
+    - Vienna Institute for Archaeological Science (VIAS), University of Vienna, Franz-Klein-Gasse 1, 1190 Vienna, Austria
+    - Naturhistorisches Museum Wien (NHMW), Burgring 7, 1010 Vienna, Austria 
+    - Research Network Human Evolution und Archaeological Sciences (HEAS), University of Vienna, Djerassiplatz 1, 1030 Vienna, Austria
+date: "`r Sys.Date()`" 
+
+toc: true
+toc-depth: 5
+toc-title: Content
+number-sections: true
+callout-icon: false
+lang: en
+
+knitr:
+  opts_chunk: 
+    warning: false
+    message: false
+    
+editor: visual
+license: CC BY
+
+bibliography: R-Zitate.bib
+
+format:
+  html:
+    toc-location: left
+    embed-resources: true
+    code-overflow: wrap
+    references: true
+---
+
+\newpage
+
+## Introduction
+
+### Content & Aim
+
+This R script contains workflow and example data of the conference proceedings **Methodological Innovations in pXRF studies** [@Schauer.2026b] **chapter 1 Workflow and Benchmarks for Daily Device Monitoring and Data Precision Assessment in handheld pXRF Studies** developed by M. Schauer, focusing on daily device monitoring, element and sample measurement precision. The methodology is discussed in more detail in @Schauer.2026.
+
+The script uses example data, demonstrating the calculations and providing brief explanations of the results for each method.
+
+**Precision Assessment (see @sec-LOD and @sec-CV)**
+
+The script evaluates element and sample precision:
+
+-   *LOD & LOQ* is used to identify reliable elements (see @sec-LOD):
+
+To monitor the percentage of LOD per element as provided by the device (\< LOD instead of value) a plot is generated (see @sec-LOD1).
+
+The LOD/LOQ calculation is based on the following steps (see @sec-LOD2):
+
+-   Ten replicate measurements per standard on the same measurement spot to catch statistical random error
+
+-   SDMean(1δSD) is calculated per element and standard for the device-reported measurement uncertainties (error values). Mean, Standard Deviation (SD) and Coefficient of Variation (CV - see below) are provided as well.
+
+-   MeanSD is calculated across all three standards. Additionally, Median, SD and CV are provided.
+
+-   Empirical LOD is calculated as 3\*MeanSD
+
+-   Empirical LOQ is calculated as 3.3\*LOD
+
+The basis of these calculations are three standards provided by the producer for silicate matrices (see @sec-SuS).
+
+In the next step, a table summing up violations of the empirical LOQ for all measurements and elements is created (see @sec-LOQ1)
+
+To monitor the percentage of empirical LOQ per element a plot is provided individually (see @sec-LOQ2) but also in combination with the LOD monitoring plot (see @sec-LOQ4). In both cases, 20% of violations are defined as the cut-off point - elements above this threshold are considers as not reliable for quantitative analysis.
+
+This is accompanied by and export of fully reliable (no violation of empirical LOQ) and elements flagging at least one value \< empirical LOQ (see @sec-LOQ3).
+
+It has to be stressed at this point, that elements frequently falling below detection or quantification thresholds can still yield valuable insights. While most samples may show values below LOD, a few may present detectable or even elevated concentrations, which can be archaeologically significant. However, before using such elements for interpretation, potential calibration errors or device malfunctions must be ruled out. Even if only usable qualitatively, all elements should be reviewed as part of the interpretive process.
+
+-   *Coefficient of Variation (CV)* is used to identify reliable elements and sample precision (see @sec-CV):
+
+To ensure the reliable application of the procedures outlined here, LOD is replaced with ‘0.0000001’ (see @sec-LOD, @sec-CV).
+
+The CV is calculated based on an example pottery dataset (see @sec-SuS) with repeated measurements of the same sample (generally three) to assess overall sample precision and determine which elements are reliable across the entire dataset (see @sec-CV). The CV-benchmark is set based on the material analysed. From the literature, a CV-benchmark of 15% for archaeological pottery, stone, daub and in-situ measurements of soil are appropriate. For obsidian, dried, fine-grained and homogenized powder of sediments measured in a measurement cup and pressed tablets, a CV of 10%, as suggested for highly homogeneous samples such as standards, can be applied. Additionally, no more than 20% of elements considered reliable for a sample may exceed the benchmarks.
+
+The steps applied in this protocol are
+
+-   Calculate the CVs for all samples and the total mean CVs for all elements in the example data (see @sec-CV1)
+
+-   Provide a color-coded spreadsheet export highlighting all CV\>15% (see @sec-CV2). This spreadsheet can be consulted during data interpretation to define the reliability of elements for specific samples which is especially important when identifying ouliers.
+
+-   Create a monitoring plot displaying the mean CVs for all elements individually (see @sec-CV3) or combined with LOD and LOQ plots (see @sec-CV4). For CV of this example, the benchmark is set at a maximum of 15%.
+
+-   Create number-codes spreadsheet with sample CVs below 15% substituted with "0" (no violation) and above 15% with "1" (benchmark violation) (see @sec-CV5). Based on this file, sample violation percentage is calculated across reliable elements (see @sec-CV6). Violating elements are defined by combining the results of LOD, LOQ and CV monitoring (see @sec-CV4).
+
+-   Reliable (less then 20% of reliable elements with CV\>15%) and violating samples (more then 20% of reliable elements with CV\>15%) are identified (see @sec-CV7).
+
+-   Create a spreadsheet of reliable and violating elements (see @sec-CV8).
+
+-   Export of all relevant documentation: a list of reliable and unreliable elements, the complete spreadsheet with codes 0 (\<15% CV) and 1 (\>15% CV) for all elements and samples analysed including mean CVs for elements and a separate spreadsheet showing only reliable elements and highlighting samples with \>20% violation of the CV benchmark for reliable elements (see @sec-CV9).
+
+**Daily Device monitoring (see @sec-dm)**
+
+To monitor daily device performance, the following methods are employed:
+
+-   *Control Limits (nominal values)* are calculated to define the reference values for device monitoring based on the specific mode, the matrix to be analysed and the therefore selected standard (see @sec-nv).
+
+Upper and Lower Control Limits are calculated at mean 1x2δSD, 2x2δSD and 3x2δSD. Additionally, CV and Standard Error of the Mean as well as the Median of the reference data is provided (see @sec-nv1). The spreadsheet with all metrics is exported (see @sec-nv2) with the optional addition of adding manufacturer and empirical LOD as well as empirical LOQ (see @sec-nv21; data derived from @sec-LOD2). For visualisation, the difference of the mean Control Limit (nominal value) to LOQ, two plots of difference (see @sec-nv22) and Percent Relative Difference (%RD; see also @sec-nv1) are provided (see @sec-nv23). LODs and LOQ can be added to the data export as well (see @sec-nv24).
+
+As additional export option, a spreadsheet of the selected elements for rapid on-screen daily device monitoring for the specific mode and material is provided (see also @Schauer.2026 (see @sec-nv3). 2/3 out of the selected elements with CV ≤ 10% (1δSD) have to fall in the defined Control Limits.
+
+-   *Shewhart Control Charts (SCCs)* are constructed using said reference values to monitor device performance (see @sec-SCC).
+
+In the first step, the spreadsheet created in @sec-nv2 respective @sec-nv21 is re-formatted (see @sec-SCC1).
+
+Following this, SCCs are created to visually monitor short-term s-drift (see @sec-SCC2) and long-term l-drift (see @sec-SCC3).
+
+-   *Relative Percentage Difference (%RD)* is calculated to further evaluate device performance in regard to accuracy (see @sec-RD). The %RD hast to be below 10% and above -10%.
+
+The %RD is calculated and prepared as a spreadsheet (see @sec-RD1). Optionally, empirical LOD and Control Limit mean can be added (see @sec-RD11).
+
+Based on this, a color-coded spreadsheet for export (see @sec-RD2) and visualisation of %RD through plots is created (see @sec-RD3).
+
+**Conclusion (see @sec-C)**
+
+The conclusion gives a summary of the results based on the example data and the potential benefit of this script for handeld pXRF studies.
+
+### Skript & Packages
+
+This Quarto script (R Quarto v.1.5.55) [@Allaire.2024] was created using R v.4.4.1 [@RCoreTeam.2024] and RStudio v.2024.04.2 [@RStudioTeam.2024]. The following R packages are employed:
+
+-   basictabler [@Bailiss.2021]
+-   dplyr [@Wickham.2023b]
+-   ggpubr [@Kassambara.2023]
+-   ggplot2 [@Wickham.2016]
+-   openxlsx [@Schauberger.2024]
+-   purrr [@Wickham.2023]
+-   qcc [@Scrucca.2004]
+-   readr [@Wickham.2024]
+-   tidyr [@Wickham.2024b]
+-   stringr [@Wickham.2023b]
+
+Before running the analyses, all packages must be loaded (see @sec-Packages) and the working directory set (see @sec-Working-Directory).
+
+The script runs without errors, provided the predefined data structure is maintained.
+
+### Device & Measurement Parameters {#sec-Para}
+
+Data for this protocol was collected using the Bruker Tracer 5g (serial no. 900G6390) of the Vienna Institute for Archaeological Science, operating in MudrockDual mode (Major (15kV/27.9μA, no filter): 60s; Trace (40kV/38.85μA, Ti 25μm/Al 300μm): 60s) with an 8 mm collimator. The device is equipped with a 20 mm² silicon drift detector (SDD) and a graphene window, providing an energy resolution of \<140eV at 250.000 cps (measured at MnKα). Measurements were conducted between 26 February and 14 May 2025 (30–45% rel.hum.; 20–27°C), as part of the FWF ESPRIT Project 476 *Standardising Portable X-ray Fluorescence for Archaeometry* [@Schauer.2023].
+
+### Standards & Samples {#sec-SuS}
+
+The dataset includes pottery samples created for experimental purposes in the scope of ESP 476 [@Schauer.2023] and reference standards (SiO2, Mudrock Standard, SdAR-M2 [@InternationalAssociationofGeoanalysts.2017]) supplied by the manufacturer. Where the device output reported measurement values as "\< LOD", a placeholder value of 0.0000001 was used to retain data structure and enable downstream analysis.
+
+For the element and sample precision example (@sec-LOD and @sec-CV) the pottery samples were measured three times at non-overlapping positions, the 10-fold standard measurements on the same position. Repeated measurements for the example data for device testing were carried out on the powder Standard SdAR-M2 on the same measurement position (see @sec-dm).
+
+### Manufacturer LOD
+
+For the settings used in this study (see @sec-Para), no manufacturer-provided LODs were available. However, the supplier provided a guide for manually calculating LODs from the calibration spectra specific to the device. The author followed this guide, applying the ASTM E2926 standard to generate the values [@ASTMInternationalE30.01Committee.2017], and is grateful to Josef Schuller and Dr. Kathrin Schneider for their support and guidance throughout this process.
+
+### Funding
+
+This research was funded by the Austrian Science Fund (FWF) 10.55776/ESP476 [@Schauer.2023].
+
+## Packages {#sec-Packages}
+
+::: {.callout-note title="Background" collapse="true" appearance="minimal"}
+After <https://www.projectpro.io/recipes/load-package-r> and <https://www.dataquest.io/blUCL/install-package-r/>
+:::
+
+```{r}
+library(basictabler)
+library(dplyr)
+library(ggpubr)
+library(ggplot2)
+library(openxlsx)
+library(purrr)
+library(qcc)
+library(readr)
+library(stringr)
+library(tidyr)
+```
+
+## Set working directory {#sec-Working-Directory}
+
+::: {.callout-note title="Background" collapse="true" appearance="minimal"}
+After <https://martinctc.github.io/blUCL/rstudio-projects-und-working-directories-a-beginner%27s-guide/>, <https://www.grainge.org/pages/authoring/relative_paths/relative_paths.htm> and <https://r4ds.had.co.nz/workflow-projects.html>
+:::
+
+```{r}
+knitr::opts_knit$set(root.dir = "./")
+```
+
+## Article Section 3.1 - monitoring LOD and LOQ for element precision {#sec-LOD}
+
+### Create monitoring LOD plot {#sec-LOD1}
+
+```{r}
+# Load data
+data1 <- read_csv("../data_analytical/Example_data_precision.csv")
+
+# Filter data
+data2 <- data1 %>%
+  select(!contains(" Err"))
+data <- data2[, c(17:40)]
+
+# Calculate LOD proportion per element
+LOD_proportions <- data|> 
+  dplyr::select(where(~ any(grepl("< LOD", .))))  |> # Keep only columns containing "<LOD"
+  summarise(across(everything(), ~ sum(grepl("< LOD", .)) / n()*100)) |>  # Calculate proportion of "<LOD" per column
+  pivot_longer(everything(), names_to = "Element", values_to = "Proportion_LOD") |>  # Convert to long format
+  arrange(desc(Proportion_LOD))  # Sort by proportion in descending order
+
+# Create Diagram
+LOD_plot<-ggplot(LOD_proportions, aes(x = reorder(Element, -Proportion_LOD), y = Proportion_LOD)) +
+  geom_bar(stat = "identity", fill = "orange") +  
+  labs(x = "Element",y = "Percentage of <LOD as presented by the device",) +
+  theme_light()+
+  scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) +
+  geom_hline(yintercept = 20, color = "black", linetype = "dashed", linewidth = 1)+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# View plot
+print(LOD_plot)
+```
+
+**Interpretation**: Monitoring the LOD presented by the device based on the measurement mode revealed the elements Co and Ba as clearly violating the benchmark of 20% of measurement values per element below LOD with P and S needing to be evaluated further.
+
+### Calculate Empirical LOD & LOQ from Standard Measurements {#sec-LOD2}
+
+```{r}
+# Load data
+data7 <- read_csv("../data_analytical/Example_data_LOD.csv")
+
+# Standardise Measurement Uncertainty from 2Sgima to 1Sigma
+data8 <- data7 %>%
+  mutate(across(ends_with(" Err"), ~ . / 2))
+
+# Standardise Measurement Uncertainty from 1Sgima to 3Sigma
+data <- data8 %>%
+  mutate(across(ends_with(" Err"), ~ . * 3))
+
+# Calculate mean, SD and CV of Measurement Uncertainty per sample and element
+data1 <- data %>%
+  group_by(SAMPLE) %>%
+  summarise(
+    across(
+      .cols = ends_with(" Err"),
+      .fns = list(
+        Mean = ~ mean(.x, na.rm = TRUE),
+        SD   = ~ sd(.x, na.rm = TRUE),
+        CV   = ~ sd(.x, na.rm = TRUE) / mean(.x, na.rm = TRUE)*100
+      ),
+      .names = "{.col}_{.fn}"
+    )
+  )
+
+# Convert % to ppm and round results
+data2 <- data1 %>%
+  mutate(across(
+    .cols = where(is.numeric) & !matches("_CV$"),
+    .fns = ~ .x * 10000
+  )) %>%
+  mutate(across(matches("_CV$"), ~ round(.x, 2))) %>%
+  mutate(across(matches("_SD$|_Mean$"), ~ round(.x, 0)))
+
+# Clean column names
+colnames(data2)[-1] <- str_replace(colnames(data2)[-1], "\\ Err", "")
+
+# Reshape: metric as rows, samples as columns
+data3 <- data2 %>%
+  pivot_longer(
+    cols = -SAMPLE,
+    names_to = "metric",
+    values_to = "value"
+  ) %>%
+  pivot_wider(
+    names_from = SAMPLE,
+    values_from = value
+  )
+
+# Compute LOD (3×SD), LOQ (3.3×LOD) across standards
+data4 <- data3 %>%
+  rowwise() %>%
+  mutate(
+    Element_mean = round(mean(c_across(2:last_col()), na.rm = TRUE), 0),
+    Element_median = round(median(c_across(2:last_col()), na.rm = TRUE), 0),
+    Element_SD   = round(sd(c_across(2:last_col()), na.rm = TRUE), 0),
+    Element_CV   = round((Element_SD/Element_mean) * 100, 0)
+  ) %>%
+  ungroup() %>%
+  mutate(
+    Empirical_LOD = round(3 * Element_mean, 0),
+    Empirical_LOQ = round(3.3 * Empirical_LOD, 0)
+  )
+
+
+# Manufacturer-defined LODs (must match the metric names, e.g., "Fe_Mean")
+lod_table <- tibble::tibble(
+  metric = c("Na_Mean", "Mg_Mean", "Al_Mean", "Si_Mean", "P_Mean", "S_Mean", "K_Mean", "Ca_Mean", "Ti_Mean",
+             "V_Mean", "Cr_Mean", "Mn_Mean", "Fe_Mean", "Co_Mean", "Ni_Mean", "Cu_Mean", "Zn_Mean", "As_Mean",
+             "Rb_Mean", "Sr_Mean", "Y_Mean", "Zr_Mean", "Nb_Mean", "Mo_Mean", "Ba_Mean", "Pb_Mean", "Th_Mean", "U_Mean"),
+  Manufacturer_LOD = c(892, 404, 111, 56, 12, 32, 16, 14, 8, 2, 3,
+            10, 8, 0, 3, 1, 2, 2,2,2,2,1,3,4,17,14,2,2)
+)
+
+# Merge
+data5 <- data4 %>%
+  left_join(lod_table, by = "metric") %>%
+  relocate(Empirical_LOD, Manufacturer_LOD, Empirical_LOQ, .after = Element_CV)
+
+# Print data
+print(data5)
+
+# Save the LOD/LOQ results
+write_csv(data5, "../data_analytical/Example_data_empirical_LOD_LOQ.csv")
+```
+
+### Flagg Measurement Values below LOQ {#sec-LOQ1}
+
+```{r}
+# Load data
+data5 <- read_csv("../data_analytical/Example_data_empirical_LOD_LOQ.csv")
+
+# Get LOQ values, clean up metric names
+data_loq <- data5 %>%
+  filter(!is.na(Empirical_LOQ)) %>%
+  mutate(metric = str_replace(metric, "_Mean$", "")) %>%
+  select(metric, Empirical_LOQ) %>%
+  pivot_wider(names_from = metric, values_from = Empirical_LOQ)
+
+loq_vector <- as.list(data_loq[1, ])  # Named list of LOQ values
+
+# Load sample measurement data
+data6 <- read_csv("../data_analytical/Example_data_precision.csv")
+
+# Clean and scale the measurement data
+data7 <- data6 %>%
+  mutate(across(17:71, ~ case_when(
+    . == "< LOD" ~ "0.0000001",
+    TRUE ~ as.character(.)
+  ))) %>%
+  mutate(across(17:71, ~ as.numeric(.))) %>%
+  mutate(across(17:71, ~ case_when(
+    . >= 0.0000001 ~ . * 10000,  # Convert % to ppm
+    TRUE ~ .
+  )))
+
+# Select measurement data + SAMPLE
+data_cleaned <- data7[, c("SAMPLE", names(data7)[17:70])]
+
+# Clean column names
+data_cleaned <- data7[, c("File", names(data7)[17:70])]
+names(data_cleaned) <- names(data_cleaned) %>% str_replace_all(" ", ".")
+
+# Apply LOQ checks
+check_results <- data_cleaned
+
+for (element in names(loq_vector)) {
+  value_col <- element
+  err_col <- paste0(element, ".Err")
+  flag_col <- paste0(element, "_flag")
+  
+  if (!(value_col %in% names(check_results)) || !(err_col %in% names(check_results))) {
+    warning(paste("Skipping", element, "- column missing"))
+    next
+  }
+  
+  loq <- loq_vector[[element]]
+  
+  check_results[[flag_col]] <- case_when(
+    is.na(check_results[[value_col]]) | is.na(check_results[[err_col]]) ~ NA_character_,
+    check_results[[value_col]] < loq & 
+      (check_results[[value_col]] - check_results[[err_col]]) < loq ~ "[LOW][LOW-ERR]",
+    check_results[[value_col]] < loq ~ "[LOW]",
+    (check_results[[value_col]] - check_results[[err_col]]) < loq ~ "[LOW-ERR]",
+    TRUE ~ ""
+  )
+}
+
+# Keep only rows and columns with at least one flag
+flag_columns <- names(check_results)[str_ends(names(check_results), "_flag")]
+
+# Filter rows with any flag present
+filtered_flags <- check_results %>%
+  filter(if_any(all_of(flag_columns), ~ . != "")) %>%
+  select(File, all_of(flag_columns))
+
+# Count flags per column, convert to character
+flag_summary_row <- filtered_flags %>%
+  select(-File) %>%
+  summarise(across(everything(), ~ as.character(sum(. != "", na.rm = TRUE))))
+
+# Add File label to mark the summary row
+flag_summary_row <- tibble(File = "TOTAL_FLAGS", flag_summary_row)
+
+# Make sure File is character in main data
+filtered_flags <- filtered_flags %>%
+  mutate(File = as.character(File))
+
+# Combine
+flag_results_with_total <- bind_rows(flag_summary_row, filtered_flags)
+
+# View result
+print(flag_results_with_total)
+
+# Save data
+write_csv(flag_results_with_total, "../data_analytical/Example_data_empirical_LOD_flaggedData.csv")
+```
+
+### Monitor proportion of LOQ - Create LOQ plot {#sec-LOQ2}
+
+```{r}
+# Load the flagged data
+data <- read_csv("../data_analytical/Example_data_empirical_LOD_flaggedData.csv")
+
+# Identify all _flag columns
+flag_columns <- names(data)[str_ends(names(data), "_flag")]
+
+# Calculate percentage of non-empty flags per column
+LOQ_proportions <- data %>%
+  summarise(across(all_of(flag_columns), ~ sum(. != "" & !is.na(.)) / n() * 100)) %>%
+  pivot_longer(everything(), names_to = "Element", values_to = "Proportion_LOQ") %>%
+  mutate(Element = str_remove(Element, "_flag$")) %>%
+  arrange(desc(Proportion_LOQ))
+
+# Create diagram
+LOQ_plot <- ggplot(LOQ_proportions, aes(x = reorder(Element, -Proportion_LOQ), y = Proportion_LOQ)) +
+  geom_bar(stat = "identity", fill = "firebrick") +
+  labs(x = "Element", y = "Percentage of Empirical LOQ Violations") +
+  theme_light()+
+  scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) +
+  geom_hline(yintercept = 20, color = "black", linetype = "dashed", linewidth = 1)+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# View plot
+print(LOQ_plot)
+```
+
+**Interpretation**: The proportion per element of values below LOQ revealed the elements Ba, Co, Mo, Nb, U, Cr, V, As, P, Pb, Mg, Cu and S to violate the 20% benchmark, while Y needs further evaluation.
+
+### Export Element Report {#sec-LOQ3}
+
+```{r}
+# Load the flagged data
+data <- read_csv("../data_analytical/Example_data_empirical_LOD_flaggedData.csv")
+
+# Identify all _flag columns
+flag_columns <- names(data)[str_ends(names(data), "_flag")]
+
+# Calculate proportion of non-empty flags per column
+element_summary <- data |>
+  summarise(
+    across(
+      all_of(flag_columns),
+      ~ sum(. != "" & !is.na(.)) / n() * 100
+    ) # Calculate percentage of flagged samples per element
+  ) |>
+    pivot_longer(
+    everything(),
+    names_to = "Element",
+    values_to = "Proportion_LOQ"
+  ) |> # Reshape into long format: one row per element
+  
+  mutate(
+    Element = str_remove(Element, "_flag$"), # Remove "_flag" suffix
+    Category = if_else(Proportion_LOQ > 20, "Violating Elements", "Reliable Elements") # Categorise elements as 'Violating' or 'Reliable' based on 20% threshold
+  ) |>
+    arrange(Category, desc(Proportion_LOQ)) |> # Sort elements within each category by descending proportion
+    group_by(Category) |> # Combine element names into a single comma-separated string per category
+  summarise(
+    Elements = paste(Element, collapse = ", ")
+  ) |>
+  # Add row numbers to mimic 1: Reliable, 2: Violating output
+  mutate(Row = row_number()) |>
+  select(Row, Category, Elements)
+
+# View final result
+print(element_summary, n = Inf)
+
+# Save data
+write_csv(element_summary, "../data_analytical/Example_data_LOQ_elements.csv")
+```
+
+### Create combined LOD & LOQ monitoring plot {#sec-LOQ4}
+
+```{r}
+# Combine LOD_plot and LOQ_plot side by side
+combined_plot_LOQ_LOD <- ggarrange(
+  LOD_plot,
+  LOQ_plot,
+  ncol = 2,
+  widths = c(1, 2),
+  align = "hv"
+)
+
+# View final result
+print(combined_plot_LOQ_LOD)
+
+# Save as PDF
+ggsave(
+  filename = "../figures/LOD_LOQ_combined.eps",
+  plot = combined_plot_LOQ_LOD,
+  device = "pdf",
+  width = 15,         
+  height = 8,         
+  units = "cm"
+)
+```
+
+## Article Section 3.2 - Monitor CV for element and sample precision {#sec-CV}
+
+### Create Spreadsheet with CVs {#sec-CV1}
+
+```{r}
+# Load data
+data1 <- read.csv("../data_analytical/Example_data_precision.csv")
+
+# Replace LOD with 0.0000001
+data2 <- data1 %>%
+  mutate(across(17:71, ~ case_when(
+    . == "< LOD" ~ "0.0000001",
+    TRUE ~ as.character(.)
+  ))) %>%
+  mutate(across(17:71, ~ as.numeric(.)))
+
+
+# Select relevant columns: SAMPLE + measurement values
+data <- data2[, c(17:70,6)]
+
+# CV function
+CV <- function(x) { (sd(x) / mean(x)) * 100 }
+
+# Calculate CV for each sample
+SampleControl1 <- data %>%
+  group_by(SAMPLE) %>%
+  summarize(across(everything(), list(CV = CV)))
+
+# Extract columns with "_CV"
+cv_columns <- grep("_CV", colnames(SampleControl1), value = TRUE)
+cv_columns <- cv_columns[!grepl("Err_CV", cv_columns)]
+
+# Create a new dataframe with only the selected columns
+SampleControl2 <- SampleControl1[, c(cv_columns)]
+
+# Substitute infinite values, missing values and CV above 99% with 99
+Control_CV <- lapply(SampleControl2, function(x) {
+  x[is.na(x) |is.infinite(x) | x > 99] <- 99
+  return(x)
+})
+
+# To rebind into a dataframe
+Control_CV <- as.data.frame(Control_CV)
+
+# Merge with Sample description
+Control_CV1 <- Control_CV %>%
+  mutate(SAMPLE = SampleControl1$SAMPLE)
+
+# Calculate mean for each column (excluding SAMPLE)
+mean_row <- Control_CV1 |>
+  select(-SAMPLE) |>
+  summarise(across(everything(), mean, na.rm = TRUE)) |>
+  mutate(SAMPLE = "Mean")
+
+# Add mean row to the top of the data and row SAMPLE to the front
+Control_CV1_1 <- bind_rows(mean_row, Control_CV1) |>
+  select(SAMPLE, everything())
+```
+
+### Creating a benchmark-color-coded spreadsheet of CV-values {#sec-CV2}
+
+```{r}
+# Create table
+tbl <- BasicTable$new()
+tbl$addData(Control_CV1_1, firstColumnAsRowHeaders=TRUE)
+
+# Get the number of rows and columns in the dataset
+num_rows <- nrow(Control_CV1_1)
+num_columns <- ncol(Control_CV1_1)
+
+# Find the index of the column with the header "SAMPLE"
+sample_column_index <- which(names(Control_CV1_1) == "SAMPLE")
+
+# Define the columns to style (excluding the 'SAMPLE' column)
+column_indices_to_style <- setdiff(1:num_columns, sample_column_index)
+
+# Ensure last row is included in styling
+cells <- tbl$getCells(
+  rowNumbers = 2:(num_rows + 1),
+  columnNumbers = column_indices_to_style,
+  matchMode = "combinations"
+)
+
+# Apply the styling
+tbl$mapStyling(
+  cells = cells,
+  styleProperty = "background-color",
+  valueType = "color",
+  mapType = "logic",
+  mappings = list(
+    "v > 15", "firebrick",   # Values greater than 15%
+    "v <= 15", "black"      # Values less than 15%
+  )
+)
+
+# Render the table with applied styles
+tbl$renderTable()
+
+# Save the table to an Excel workbook
+wb <- createWorkbook(creator = Sys.getenv("M. Schauer"))
+addWorksheet(wb, "Data")
+tbl$writeToExcelWorksheet(wb = wb, wsName = "Data", topRowNumber = 1, leftMostColumnNumber = 1, applyStyles = TRUE)
+
+# Save the workbook
+saveWorkbook(wb, file = "../data_analytical/Example_data_precision_colcode_all.xlsx", overwrite = TRUE)
+```
+
+**Comment**: This spreadsheet can be used to gain a better understanding of the severity of the benchmark violation. It is especially useful for interpreting outliers in the later stages of data analysis, to assess whether the elements defining an outlier were measured with sufficient precision.
+
+### Create CV-mean plot {#sec-CV3}
+
+```{r}
+# Extract and reshape mean row
+mean_values <- Control_CV1_1[1, ] |>
+  select(-SAMPLE) |>
+  pivot_longer(
+    cols = everything(),
+    names_to = "Element",
+    values_to = "Mean_CV"
+  ) |>
+  mutate(
+    Element = gsub("_CV$", "", Element),   # Remove "_CV" suffix
+    Mean_CV = round(Mean_CV, 2)
+  )
+
+# Create the bar plot
+mean_cv_plot <- ggplot(mean_values, aes(x = reorder(Element, -Mean_CV), y = Mean_CV)) +
+  geom_bar(stat = "identity", fill = "purple") +
+  labs(
+    x = "Element",
+    y = "Mean CV (%) across all samples"
+  ) +
+  theme_light() +
+  geom_hline(yintercept = 15, color = "black", linetype = "dashed", linewidth = 1) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# Show the plot
+print(mean_cv_plot)
+```
+
+### Create combined LOD, LOQ, CV monitoring plot {#sec-CV4}
+
+```{r}
+
+# Create mean plot
+mean_cv_plot <- ggplot(mean_values, aes(x = reorder(Element, -Mean_CV), y = Mean_CV)) +
+  geom_bar(stat = "identity", fill = "purple") +
+  labs(
+    x = "Element",
+    y = "Mean CV (%) across all samples"
+  ) +
+  theme_light() +
+  scale_y_continuous(limits = c(0, 100), expand = c(0, 0)) +
+  geom_hline(yintercept = 15, color = "black", linetype = "dashed", linewidth = 1) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+# Combine LOD_plot and LOQ_plot side by side
+combined_plot_LOQ_LOD_CV <- ggarrange(
+  LOD_plot,
+  LOQ_plot,
+  mean_cv_plot,
+  ncol = 3,
+  widths = c(0.75,2, 2),
+  align = "v"
+)
+
+# View final result
+print(combined_plot_LOQ_LOD_CV)
+
+# Save as PDF
+ggsave(
+  filename = "../figures/LOD_LOQ_CV_combined.pdf",
+  plot = combined_plot_LOQ_LOD_CV,
+  device = "pdf",
+  width = 30,
+  height = 10,
+  units = "cm"
+)
+```
+
+**Interpretation**: The results show that the mean CV benchmark of 15% is violated by the elements P, U, Co, Ba, S and Cr. For Pb, As and Mo, the closeness to the benchmark need checking back with the monitoring results of LOD and LOQ which, all together, make very clear that those elements also can be reliably used for interpretation of this dataset. Yet, in the case of Y, this element shows as low CV and is therefore categorised as reliable. This leaves for this dataset as reliable elements Si, Ti, Al, Fe, Mn, Ca, K, Ni, Zn, Rb, Sr, Y, Zr and Th.
+
+### Apply benchmark and add mean CV for elements {#sec-CV5}
+
+To adjust the benchmark, for example, to 10%, simply replace 15 with 10 in all code blocks that involve the CV calculation.
+
+```{r}
+# Convert values > 15 to 1, otherwise 0
+Control_CV2 <- Control_CV1 %>%
+  mutate(across(.cols = -SAMPLE, .fns = ~ ifelse(. > 15, 1, 0)))
+
+# Calculate mean for each column (excluding SAMPLE)
+mean_row <- Control_CV1 |>
+  select(-SAMPLE) |>
+  summarise(across(everything(), mean, na.rm = TRUE)) |>
+  mutate(SAMPLE = "Mean")
+
+# Add mean row to the top of the data and row SAMPLE to the front
+Control_CV3 <- bind_rows(Control_CV2,mean_row)
+
+# Round all numerical values to full numbers
+Control_CV4 <- Control_CV3 %>%
+  mutate(across(where(is.numeric), ~ round(.)))
+```
+
+### Calculating violation per sample {#sec-CV6}
+
+The violating elements were defined by checking all precision criteria - LOD, LOQ and mean CV per element
+
+```{r}
+# Define violating elements to exclude from calculations of row percentage
+violating_elements <- c("P_CV","Mg_CV","S_CV","V_CV","Cr_CV","Co_CV","Cu_CV","As_CV","Nb_CV","Mo_CV","Pb_CV","Ba_CV","U_CV")
+
+# Define reliable elements
+exclude_cols <- c("SAMPLE", "row_sum", "row_percent", violating_elements) # columns to always exclude
+reliable_elements <- setdiff(names(Control_CV4), exclude_cols) # keep everything else
+
+# Combine "SAMPLE" and violating_elements into a vector for exclusion
+exclude_columns <- c("SAMPLE", violating_elements)
+
+# Calculate the sum of each row, excluding "SAMPLE" and high percentage columns
+Control_CV4$row_sum <- rowSums(Control_CV4[, !names(Control_CV4) %in% exclude_columns], na.rm = TRUE)
+
+# Count the number of columns excluding "SAMPLE" and "Row_sum" and high percentage columns
+valid_columns_count <- ncol(Control_CV4) - (length(exclude_columns)+2)
+
+# Calculate the percentage of the Row_sum for each row based on the number of valid columns
+Control_CV4$row_percent <- Control_CV4$row_sum / (valid_columns_count) * 100
+
+# Replace the four cells in the lowest-right corner with NA
+n_rows <- nrow(Control_CV4)  # Number of rows
+n_cols <- ncol(Control_CV4)  # Number of columns
+Control_CV4[n_rows, (n_cols - 1):n_cols] <- NA
+
+# Round all numerical values to full numbers and sort by "row_percent" in descending order
+Control_CV5 <- Control_CV4 %>%
+  mutate(across(where(is.numeric), ~ round(.))) %>%
+  arrange(desc(row_percent))
+
+# print data
+head(Control_CV5)
+```
+
+### Filtering for reliable elements and violating samples {#sec-CV7}
+
+```{r}
+# Select reliable elements
+Control_CV6 <- Control_CV5 |>
+  select(all_of(reliable_elements), 
+         tail(names(Control_CV5), 3)) # Add the last three columns back to the selected columns
+
+# Filter rows where "row_percent" is greater than 20 (violating samples) and sort by "row_percent" in descending order
+Control_CV7 <- Control_CV6 %>%
+  filter(row_percent > 20) %>%
+  arrange(desc(row_percent))
+
+# print data
+print(Control_CV7)
+```
+
+**Interpretation**: This result shows that a total of six samples violate too many of the reliable elements (\>20% violation of the CV benchmark) defined in above. Therefore, these samples have to be evaluated to identify the likely cause for the high variability. Re-measurements have to be undertaken.
+
+### Create spreadsheet with information on elements {#sec-CV8}
+
+```{r}
+# Ensure both vectors are of the same length by adding "NA" values where necessary
+max_length <- max(length(reliable_elements), length(violating_elements))
+
+# Remove "_CV" suffix from element names
+reliable_elements <- gsub("_CV$", "", reliable_elements)
+violating_elements <- gsub("_CV$", "", violating_elements)
+
+# Extend shorter vector with NA to match the max length
+reliable_elements <- c(reliable_elements, rep(NA, max_length - length(reliable_elements)))
+violating_elements <- c(violating_elements, rep(NA, max_length - length(violating_elements)))
+
+# Create a named list to store the information
+elements_list <- list(
+  "Reliable Elements" = paste(reliable_elements, collapse = ", "),
+  "Violating Elements" = paste(violating_elements, collapse = ", ")
+)
+
+# Convert the list into a data.frame (row-based)
+elements <- data.frame(Name = names(elements_list), Values = unlist(elements_list), row.names = NULL, stringsAsFactors = FALSE)
+
+# Explicitly replace any NA values with a space in the Values column
+elements$Values <- gsub("NA", " ", elements$Values)
+
+print(elements)
+```
+
+### Exporting tables {#sec-CV9}
+
+```{r}
+# Export information on elements
+write.csv(elements,"../data_analytical//Example_data_CV_elements.csv",row.names=FALSE)
+
+# Export all elements and samples with sums and percentage as .csv
+write.csv(Control_CV5,"../data_analytical//Example_data_CV_numcode_all.csv",row.names=FALSE)
+
+# Export reliable elements and violating samples as .csv
+write.csv(Control_CV7,"../data_analytical//Example_data_CV_numcode_violation.csv",row.names=FALSE)
+```
+
+**Comment**: These exports provide a list of reliable and unreliable elements (Example_data_precision_elements.csv). The complete spreadsheet Example_data_precision_numcode_all.csv uses the codes 0 (\<15% CV) and 1 (\>15% CV) for all elements and samples analysed. Additionally, a separate spreadsheet (Example_data_precision_numcode_violation.csv) shows only reliable elements and highlights files that violate too many of them (\>20% violation of the CV benchmark).
+
+## Article Section 3.3 - Monitoring SCCs and %RD for device performance {#sec-dm}
+
+### Create Control Limits (nominal value) {#sec-nv}
+
+::: {.callout-note title="Background" collapse="true" appearance="minimal"}
+After <https://stackoverflow.com/questions/39670918/replace-characters-in-column-names-gsub> and <https://search.r-project.org/R/refmans/base/html/Round.html>
+:::
+
+#### Compute metrics of reference values {#sec-nv1}
+
+The name of the .csv-spreadsheet includes the standard the reference values are based on (SdAR-M2), month and year of measurement (March 2025 - mar2025) as well as the location (Vienna - vie): SdAR-M2_mar2025_vie.csv. This makes the file easy to identify for future use.
+
+```{r}
+# Load data
+data1 <- read.csv("../data_analytical/SdAR-M2_mar2025_vie.csv")
+
+# Replace '< LOD' with 0.0000001 in each column
+data2 <- data1 %>%
+  mutate(across(17:71, ~ case_when(
+    . == "< LOD" ~ "0.0000001",
+    TRUE ~ as.character(.)
+  ))) %>%
+  mutate(across(17:71, ~ as.numeric(.))) %>%
+  mutate(across(17:71, ~ case_when(
+    . >= 0.0000001 ~ . * 10000,  # Convert % to ppm
+    TRUE ~ .
+  ))) %>%
+  mutate(across(everything(), as.numeric))  # Ensure all values are numeric
+
+# Remove first 16 columns (no elemental data)
+data <- data2[, -c(1:16)]
+
+# Replace '.' with '_' in column names
+data <- data %>%
+  rename_with(~ gsub("\\.", "_", .x))
+
+# Define statistical functions
+CV <- function(x) (sd(x, na.rm = TRUE) / mean(x, na.rm = TRUE)) * 100
+SEM <- function(x) sd(x, na.rm = TRUE) / sqrt(length(x))
+UCL <- function(x) mean(x, na.rm = TRUE) + sd(x, na.rm = TRUE)
+LCL <- function(x) mean(x, na.rm = TRUE) - sd(x, na.rm = TRUE)
+CV2 <- function(x) (2*sd(x, na.rm = TRUE) / mean(x, na.rm = TRUE)) * 100
+UCL2 <- function(x) mean(x, na.rm = TRUE) + 2*sd(x, na.rm = TRUE)
+LCL2 <- function(x) mean(x, na.rm = TRUE) - 2*sd(x, na.rm = TRUE)
+CV3 <- function(x) (3*sd(x, na.rm = TRUE) / mean(x, na.rm = TRUE)) * 100
+UCL3 <- function(x) mean(x, na.rm = TRUE) + 3*sd(x, na.rm = TRUE)
+LCL3 <- function(x) mean(x, na.rm = TRUE) - 3*sd(x, na.rm = TRUE)
+
+# Define summary statistics
+NominalSdARM2 <- data %>%
+  summarize(across(everything(), list(
+    M = ~ mean(.x, na.rm = TRUE),
+    SD = ~ sd(.x, na.rm = TRUE),
+    SEM = ~ SEM(.x),
+    CV = ~ CV(.x),
+    LCL = ~ LCL(.x),
+    UCL = ~ UCL(.x),
+    CV2 = ~ CV2(.x),
+    LCL2 = ~ LCL2(.x),
+    UCL2 = ~ UCL2(.x),
+    CV3 = ~ CV3(.x),
+    LCL3 = ~ LCL3(.x),
+    UCL3 = ~ UCL3(.x),
+    MD = ~ median(.x, na.rm = TRUE)
+  )))
+
+# Define elements
+Element <- c("Si", "Ti", "Al", "Fe", "Mn", "Mg", "Ca", "K", "P", "S", "V", "Cr", 
+             "Ni", "Cu", "Zn", "As", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Ba", 
+             "Pb", "Th", "U")
+
+# Function to clean column names
+cleanColumnNames <- function(df, prefix) {
+  colnames(df) <- gsub(paste0(prefix, "_"), "", colnames(df))
+  return(df)
+}
+
+# Function to extract and clean data for each element
+extract_element_data <- function(element, df) {
+  cols <- grep(paste0("^", element, "_(M|SD|SEM|CV|LCL|UCL|CV2|LCL2|UCL2|CV3|LCL3|UCL3|MD|Error_M|Error_SD|Error_MD)"), 
+               colnames(df), value = TRUE)
+  
+  if (length(cols) > 0) {
+    df_out <- df %>%
+      select(all_of(cols)) %>%
+      cleanColumnNames(element)
+    
+    # Add the element name as the first column
+    df_out <- cbind(Element = element, df_out)
+    return(df_out)
+  } else {
+    return(data.frame(Element = element, matrix(NA, nrow = 1, ncol = length(cols))))
+  }
+}
+
+# Process all elements & create final table
+Tab3 <- map_dfr(Element, extract_element_data, df = NominalSdARM2)
+```
+
+#### Create formated spreadsheet with all metrics {#sec-nv2}
+
+```{r}
+# Replace "Error" with "MU" in column names
+colnames(Tab3) <- gsub("Error", "MU", colnames(Tab3))
+
+# Rounding of values
+numeric_cols <- c("M", "SD", "SEM", "CV", "UCL", "LCL","CV2", "UCL2", "LCL2", "CV3", 
+                  "UCL3", "LCL3","MD", "MU_M", "MU_SD", "MU_MD")
+
+for (col in numeric_cols) {
+  if (col %in% colnames(Tab3)) {
+    Tab3[[col]] <- round(Tab3[[col]], 
+                         ifelse(col %in% c("CV", "CV2", "CV3"), 2, 
+                                ifelse(col %in% c("UCL", "LCL", "UCL2", "LCL2", "UCL3", "LCL3"), 0, 1)))
+  }
+}
+```
+
+##### Optional - adding LODs and LOQ {#sec-nv21}
+
+If you don't want to do that, just export Tab3 (see @sec-nv2) as it is.
+
+```{r}
+# Optional: Load LOD-Table and manufacturer and empirical LOD
+lod_table <- read.csv("../data_analytical/Example_data_empirical_LOD_LOQ.csv")
+
+lod_table_filtered <- lod_table %>%
+  filter(grepl("_Mean$", metric)) %>%                      # keep rows ending with '_Mean'
+  select(metric, Empirical_LOD, Manufacturer_LOD, Empirical_LOQ) %>%  # keep only relevant columns
+  mutate(metric = gsub("_Mean$", "", metric)) %>%          # remove '_Mean' suffix
+  rename(Element = metric)          
+
+# Merge into Tab3 by 'element'
+Tab4 <- Tab3 %>%
+  left_join(lod_table_filtered, by = "Element") %>%
+  filter(!is.na(Empirical_LOD) | !is.na(Manufacturer_LOD |!is.na(Empirical_LOQ)))
+
+print(Tab4)
+
+# Save final table with all reference value metrics
+write.csv(Tab4, "../data_analytical/metrics_SdAR-M2_mar2025_vie.csv", row.names = FALSE)
+```
+
+##### Create plot Difference between Mean and LOD/LOQ {#sec-nv22}
+
+```{r}
+Tab5 <- Tab4 %>%
+  mutate(
+    Diff_LOD = M - Empirical_LOD,
+    Diff_LOQ = M - Empirical_LOQ
+  ) %>%
+  filter(Diff_LOQ < 50) 
+
+# LOD difference plot
+plot_lod <- ggplot(Tab5, aes(x = reorder(Element, Diff_LOD), y = Diff_LOD)) +
+  geom_col(fill = "orange", color = "black") +
+  labs(
+    x = "Element",
+    y = "Difference of Mean to LOD"
+  ) +
+  coord_cartesian(ylim = c(-50, 50)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# LOQ difference plot
+plot_loq <- ggplot(Tab5, aes(x = reorder(Element, Diff_LOQ), y = Diff_LOQ)) +
+  geom_col(fill = "firebrick", color = "black") +
+  labs(
+    x = "Element",
+    y = "Difference of Mean to LOQ"
+  ) +
+  coord_cartesian(ylim = c(-50, 50)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+# Combine them into one row using patchwork
+# Combine LOD_plot and LOQ_plot side by side
+combined_hist <- ggarrange(
+  plot_lod,
+  plot_loq,
+  ncol = 2,
+  align = "hv"
+)
+
+# Print the combined plot
+print(combined_hist)
+```
+
+##### Create plot of %RD between Mean and LOD/LOQ {#sec-nv23}
+
+If you don't want to do that, just export Tab3 (see @sec-nv2) as it is.
+
+```{r}
+Tab5 <- Tab4 %>%
+  mutate(
+    Diff_LOD = 100 * (M - Empirical_LOD) / M,
+    Diff_LOQ = 100 * (M - Empirical_LOQ) / M
+  ) %>%
+  filter(Diff_LOQ < 50) 
+
+# LOD difference plot
+plot_lod <- ggplot(Tab5, aes(x = reorder(Element, Diff_LOD), y = Diff_LOD)) +
+  geom_col(fill = "orange", color = "black") +
+  labs(
+    x = "Element",
+    y = "%RD of Mean and LOD"
+  ) +
+  coord_cartesian(ylim = c(-50, 50)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# LOQ difference plot
+plot_loq <- ggplot(Tab5, aes(x = reorder(Element, Diff_LOQ), y = Diff_LOQ)) +
+  geom_col(fill = "firebrick", color = "black") +
+  labs(
+    x = "Element",
+    y = "%RD of Mean and LOQ"
+  ) +
+  coord_cartesian(ylim = c(-50, 50)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+# Combine them into one row using patchwork
+# Combine LOD_plot and LOQ_plot side by side
+combined_hist <- ggarrange(
+  plot_lod,
+  plot_loq,
+  ncol = 2,
+  align = "hv"
+)
+
+# Print the combined plot
+print(combined_hist)
+```
+
+##### Adding LODs and LOQ for data export {#sec-nv24}
+
+If you don't want to do that, just skip that bit.
+
+```{r}
+# Load data
+lod_table <- read.csv("../data_analytical/Example_data_empirical_LOD_LOQ.csv")
+
+# Filter for manufacturer and empirical LOD/LOQ
+lod_table_filtered <- lod_table %>%
+  filter(grepl("_Mean$", metric)) %>%                      # keep rows ending with '_Mean'
+  select(metric, Empirical_LOD, Manufacturer_LOD, Empirical_LOQ) %>%  # keep only relevant columns
+  mutate(metric = gsub("_Mean$", "", metric)) %>%          # remove '_Mean' suffix
+  rename(Element = metric)          
+
+# Merge into Tab3 by 'element'
+Tab5 <- Tab3 %>%
+  left_join(lod_table_filtered, by = "Element") %>%
+  filter(!is.na(Empirical_LOD) | !is.na(Manufacturer_LOD |!is.na(Empirical_LOQ)))
+
+print(Tab5)
+
+# Save final table with all reference value metrics
+write.csv(Tab5, "../data_analytical/metrics_SdAR-M2_mar2025_vie.csv", row.names = FALSE)
+```
+
+#### Export reference values for daily device monitoring {#sec-nv3}
+
+In the absence of guidelines for archaeological applications, elements should be chosen using the following, additional criteria: broad coverage of excitation energies, minimal peak overlaps and interferences, reliable detection (CV ≤ 10% (1δSD) ), and concentrations in the standard that meet or exceed the LOQ provided by the producer for the specific application, or if possible the empirically defined LOQ (section 2.1/3.1). Elements should also be practical to monitor as very different concentrations may be difficult to interpret due to screen limitations or rounding.
+
+This selection only includes the relevant elements - in this example Ti, Mn, Ca (MudrockMajor) and Rb, Zn, Zr (MudrockTrace) - and the values needed to define the test range in which the measurement values should lie: Element name with UCL and LCL of the 1 SD-range, UCL2/LCL2 of the 2δSD-range and UCL3/LCL3 of the 3δSD-range. You can choose the elements to export by writing them in the code for selected_elements.
+
+```{r}
+# Select only necessary columns
+dataset1 <- Tab3 %>% select(Element, LCL,UCL,LCL2,UCL2,LCL3,UCL3)
+
+# Filter for the specific elements dynamically
+selected_elements <- c("Ti", "Mn", "Ca", "Rb","Zn", "Zr")
+dataset <- dataset1 %>% filter(Element %in% selected_elements)
+
+write.csv(dataset, "../data_analytical/test_range_SdAR-M2_mar2025_vie.csv", row.names = FALSE)
+```
+
+**Comment**: This spreadsheet can be used to compare the mean of three standard measurements, as calculated by the device and displayed on the screen, with the test range of the selected elements. 2/3 of elements (in this case 4 of 6) have to be in the 2δSD-range for device monitoring to be positive.
+
+### Article Section 3.3 - Compute Shewhart Control Charts {#sec-SCC}
+
+::: {.callout-note title="Background" collapse="true" appearance="minimal"}
+After <https://rpubs.com/jamesonmarriott/239508> and <https://cran.r-project.org/web/packages/qcc/qcc.pdf>
+:::
+
+#### Create spreadsheet for Shewhart Control Charts {#sec-SCC1}
+
+```{r}
+# Transpose the data
+Tab4 <- as.data.frame(t(Tab3))
+
+# Store the original row names (before transposing)
+row_names <- rownames(Tab3)
+
+# Store the original column names (before transposing)
+col_names <- colnames(Tab3)
+
+# Assign the original row names as column names of the transposed data
+colnames(Tab4) <- row_names
+
+# Assign the original column names as row names of the transposed data
+rownames(Tab4) <- col_names
+
+# Set the first row as the column names (this will use the values of the first row as column headers)
+colnames(Tab4) <- Tab4[1, ]
+
+# Remove the first row (since it is now used as the column names)
+Tab4 <- Tab4[-1, ]
+
+# Save the table with all reference value metrics for SCC charts
+write.csv(Tab4, "../data_analytical/metrics_SCC_SdAR-M2_mar2025_vie.csv", row.names = TRUE)
+```
+
+#### Compute Shewhart Control Charts monitoring s-Drift {#sec-SCC2}
+
+```{r}
+#| output: false
+
+# Load data
+data1 <- read.csv("../data_analytical/Example_sDrift_SdAR-M2.csv")
+
+# Replace '< LOD' with 0.0000001 in each column
+data2 <- data1 %>%
+  mutate(across(17:71, ~ case_when(
+    . == "< LOD" ~ "0.0000001",
+    TRUE ~ as.character(.)
+  ))) %>%
+  mutate(across(17:71, ~ as.numeric(.))) %>%
+  mutate(across(17:71, ~ case_when(
+    . >= 0.0000001 ~ . * 10000,  # Convert % to ppm
+    TRUE ~ .
+  ))) %>%
+  mutate(across(everything(), as.numeric))  # Ensure all values are numeric
+
+# Remove first 16 and the last column (no elemental data) 
+data <- data2[, -c(1:16,71)]
+
+# Round data
+data <- round(data, 0)
+
+# Load data
+data1 <- read.csv("../data_analytical/metrics_SCC_SdAR-M2_mar2025_vie.csv")
+
+# Create PDF for all SCC plots
+pdf("../figures/SCC_SdAR-M2_sDrift_plots.pdf", width = 8, height = 6)
+
+# Define columns
+selected_columns <- c("Si", "Ti", "Al", "Fe", "Mn", "Mg", "Ca", "K", "P", "S", "V", "Cr", 
+             "Ni", "Cu", "Zn", "As", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Ba", 
+             "Pb", "Th", "U")
+
+for (col in selected_columns) {
+  
+  # Extract the data for the current column
+  chartdata <- data[, col]
+  
+  # Dynamically get metrics for current column from data1
+  CL <- data1[1, col]        
+  SD <- data1[2, col]       
+  LCL <- data1[5, col]
+  UCL <- data1[6, col]
+  LCL2 <- data1[8, col]
+  UCL2 <- data1[9, col]
+  LCL3 <- data1[11, col]
+  UCL3 <- data1[12, col]
+  
+  # Round to 0 decimal places
+  CL <- round(CL, 0)
+  SD <- round(SD, 0)
+  LCL <- round(LCL, 0)
+  UCL <- round(UCL, 0)
+  LCL2 <- round(LCL2, 0)
+  UCL2 <- round(UCL2, 0)
+  LCL3 <- round(LCL3, 0)
+  UCL3 <- round(UCL3, 0)
+
+  # Create the control chart
+  qcc_result <- qcc(
+    data = chartdata, 
+    type = "xbar", 
+    nsigmas = 1,  
+    std.dev = SD,  
+    center = CL,
+    rules = NULL,
+    plot = FALSE  
+  )
+
+  # Create the plot for the current column
+    plot(qcc_result, restore.par = FALSE, 
+       title = paste("SCC for", col),
+       ylab = "Concentration (ppm)", 
+       xlab = "Measurement values of SdAR-M2 of the Same Session (Day)")
+
+  # Add 3-Sigma control limits
+  abline(h = c(UCL3, LCL3), lty = 3, col = "black")  
+  text(x = length(chartdata) * 1, y = UCL3, labels = "UCL3", pos = 3, col = "black", cex = 0.8)
+  text(x = length(chartdata) * 1, y = LCL3, labels = "LCL3", pos = 1, col = "black", cex = 0.8)
+
+  # Add 2-Sigma control limits
+  abline(h = c(UCL2, LCL2), lty = 3, col = "black")
+  text(x = length(chartdata) * 1, y = UCL2, labels = "UCL2", pos = 3, col = "black", cex = 0.8)
+  text(x = length(chartdata) * 1, y = LCL2, labels = "LCL2", pos = 1, col = "black", cex = 0.8)
+
+  # Highlight points based on thresholds
+  below_1sigma <- chartdata < UCL | chartdata > LCL
+  below_2sigma <- chartdata > UCL | chartdata < LCL
+  above_3sigma <- chartdata > UCL3 | chartdata < LCL3
+  above_2sigma <- (chartdata > UCL2 & chartdata <= UCL3) | (chartdata < LCL2 & chartdata >= LCL3)
+
+    # Overlay red points for values in 1-sigma
+  points(which(below_1sigma), chartdata[below_1sigma], col = "lightgreen", pch = 19, cex = 1.2)
+  
+  # Overlay yellow points for values between 1-sigma and 2-sigma
+  points(which(below_2sigma), chartdata[below_2sigma], col = "lightblue", pch = 19, cex = 1.2)
+
+  # Overlay yellow points for values between 2-sigma and 3-sigma
+  points(which(above_2sigma), chartdata[above_2sigma], col = "orange", pch = 19, cex = 1.2)
+  
+  # Overlay red points for values beyond 3-sigma
+  points(which(above_3sigma), chartdata[above_3sigma], col = "red", pch = 19, cex = 1.2)
+  
+  }
+
+# Close the PDF file
+dev.off()
+```
+
+**Short-term accuracy & precision plots**
+
+<iframe width="750" height="500" src="../figures/SCC_SdAR-M2_sDrift_plots.pdf">
+
+</iframe>
+
+**Interpretation**: Skimming through the SCCs of an example of data of the same standard taken on a single measurement day reveals very accurate results for all elements. The majority of values fall within the ±1δSD range (green), with some extending into the ±1δSD to ±2δSD range (blue). Only for Ti, Cu and Ba few values fall within the ±2δSD to ±3δSD range (yellow) therefore violating the requirements of staying inside the ±2δSD. Yet, as this appears only once in a row, no action is required [@Schauer.2026]. Only Mg shows twice a clear violations of all control limits and should be excluded from data analysis. Therefore, the data can be considered accurate and, in terms of in-run consistency, precise, exhibiting minimal scatter around the mean. Additionally, this scatter appears randomly distributed on either side of the mean, with no evident drift effects.
+
+#### Compute Shewhart Control Charts monitoring l-Drift {#sec-SCC3}
+
+```{r}
+#| output: false
+
+# Load data
+data1 <- read.csv("../data_analytical/Example_lDrift_SdAR-M2.csv")
+
+# Transform date field
+data1 <- data1 |>
+  mutate(
+    Time = as.POSIXct(Time, format = "%m/%d/%Y %H:%M"),  # 24-hour format
+    Time = format(Time, "%Y/%m/%d/")  # Output as yyyy/mm/dd
+  )
+
+# Replace '< LOD' with 0.0000001 in each column
+data2 <- data1 %>%
+  mutate(across(17:71, ~ case_when(
+    . == "< LOD" ~ "0.0000001",
+    TRUE ~ as.character(.)
+  ))) %>%
+  mutate(across(17:71, ~ as.numeric(.))) %>%
+  mutate(across(17:71, ~ case_when(
+    . >= 0.0000001 ~ . * 10000,  # Convert % to ppm
+    TRUE ~ .
+  ))) %>%
+  mutate(across(everything(), as.numeric))  # Ensure all values are numeric
+
+# Remove first 16 columns (no elemental data)
+data2 <- data2[, -c(1:16)]
+
+# Combine data
+data3<-cbind(data1[, c(1:16)],data2)
+
+# Calculate mean
+mean_data <- data3 %>%
+  group_by(Time) %>%
+  summarize(across(everything(), mean, na.rm = TRUE)) %>%
+  mutate(across(where(is.numeric), ~ round(., 0)))
+
+# Remove second to sixteenth columns and last column (no elemental data) but include Time and all measurement values
+data <- mean_data[, -c(2:16,71)]
+
+# Define Labels for plotting
+time_labels <- data$Time
+
+# Load data
+data1 <- read.csv("../data_analytical/metrics_SCC_SdAR-M2_mar2025_vie.csv")
+
+# Create PDF for all SCC plots
+pdf("../figures/SCC_SdAR-M2_lDrift_plots.pdf", width = 8, height = 6)
+
+# Define columns
+selected_columns <- c("Si", "Ti", "Al", "Fe", "Mn", "Mg", "Ca", "K", "P", "S", "V", "Cr", 
+             "Ni", "Cu", "Zn", "As", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Ba", 
+             "Pb", "Th", "U")
+
+for (col in selected_columns) {
+  
+  # Extract the data for the current column
+  chartdata <- data[, col]
+  
+  # Dynamically get metrics for current column from data1
+  CL <- data1[1, col]        
+  SD <- data1[2, col]       
+  LCL <- data1[5, col]
+  UCL <- data1[6, col]
+  LCL2 <- data1[8, col]
+  UCL2 <- data1[9, col]
+  LCL3 <- data1[11, col]
+  UCL3 <- data1[12, col]
+  
+  # Round to 0 decimal places
+  CL <- round(CL, 0)
+  SD <- round(SD, 0)
+  LCL <- round(LCL, 0)
+  UCL <- round(UCL, 0)
+  LCL2 <- round(LCL2, 0)
+  UCL2 <- round(UCL2, 0)
+  LCL3 <- round(LCL3, 0)
+  UCL3 <- round(UCL3, 0)
+
+  # Create the control chart
+  qcc_result <- qcc(
+    data = chartdata, 
+    type = "xbar", 
+    nsigmas = 1,  
+    std.dev = SD,  
+    center = CL,
+    rules = NULL,
+    plot = FALSE  
+  )
+
+  # Create the plot for the current column
+    plot(qcc_result, restore.par = FALSE, 
+       title = paste("SCC for", col),
+       ylab = "Concentration (ppm)", 
+       xlab = "Mean Values of SdAR-M2 of Different Sessions (Days)")
+
+  # Add 3-Sigma control limits
+  abline(h = c(UCL3, LCL3), lty = 3, col = "black")  
+  text(x = length(chartdata) * 1, y = UCL3, labels = "UCL3", pos = 3, col = "black", cex = 0.8)
+  text(x = length(chartdata) * 1, y = LCL3, labels = "LCL3", pos = 1, col = "black", cex = 0.8)
+
+  # Add 2-Sigma control limits
+  abline(h = c(UCL2, LCL2), lty = 3, col = "black")
+  text(x = length(chartdata) * 1, y = UCL2, labels = "UCL2", pos = 3, col = "black", cex = 0.8)
+  text(x = length(chartdata) * 1, y = LCL2, labels = "LCL2", pos = 1, col = "black", cex = 0.8)
+
+  # Highlight points based on thresholds
+  below_1sigma <- chartdata < UCL | chartdata > LCL
+  below_2sigma <- chartdata > UCL | chartdata < LCL
+  above_3sigma <- chartdata > UCL3 | chartdata < LCL3
+  above_2sigma <- (chartdata > UCL2 & chartdata <= UCL3) | (chartdata < LCL2 & chartdata >= LCL3)
+
+    # Overlay red points for values in 1-sigma
+  points(which(below_1sigma), chartdata[below_1sigma], col = "lightgreen", pch = 19, cex = 1.2)
+  
+  # Overlay yellow points for values between 1-sigma and 2-sigma
+  points(which(below_2sigma), chartdata[below_2sigma], col = "lightblue", pch = 19, cex = 1.2)
+
+  # Overlay yellow points for values between 2-sigma and 3-sigma
+  points(which(above_2sigma), chartdata[above_2sigma], col = "orange", pch = 19, cex = 1.2)
+  
+  # Overlay red points for values beyond 3-sigma
+  points(which(above_3sigma), chartdata[above_3sigma], col = "red", pch = 19, cex = 1.2)
+  
+  }
+
+# Close the PDF file
+dev.off()
+```
+
+**Long-term accuracy & precision plots**
+
+<iframe width="750" height="500" src="../figures/SCC_SdAR-M2_lDrift_plots.pdf">
+
+</iframe>
+
+**Interpretation**: Evaluating the SCCs of a sample dataset from the same standard, taken over multiple measurement days, reveals highly accurate results for most elements. The majority of values fall within the ±1δSD range (green), with some extending into the ±1δSD to ±2δSD range (blue). Only for Ba and Pb each a single value falls in the ±2δSD to ±3δSD range (yellow), with Zr a single value falls outside the ±2δSD to ±3δSD range (red) therefore violating the requirements of staying inside the ±2δSD. Yet, as this appears only once, no action is required [@Schauer.2026]. Therefore, the data can be considered accurate and, in terms of in-run consistency, precise, exhibiting minimal scatter around the mean. Additionally, this scatter mostly appears randomly distributed on either side of the mean, with little evidence of drift effects. However, for some elements, such as Fe, Mn and Zr but especially P, S and Cr, a slight drift towards lower values may be visible while for Ni and Zn, the opposite seems the case.
+
+### Article Section 3.3 - Compute Relative Percentage Difference (%RD) {#sec-RD}
+
+#### Calculate %RD (l-Drift) {#sec-RD1}
+
+```{r}
+# Load data
+data1 <- read.csv("../data_analytical/Example_lDrift_SdAR-M2.csv")
+
+# Transform date field
+data1 <- data1 |>
+  mutate(
+    Time = as.POSIXct(Time, format = "%m/%d/%Y %H:%M"),  # 24-hour format
+    Time = format(Time, "%m/%d/%Y")  # Output as mm/dd/yyyy
+  )
+
+# Replace '< LOD' with 0.0000001 in each column
+data2 <- data1 %>%
+  mutate(across(17:71, ~ case_when(
+    . == "< LOD" ~ "0.0000001",
+    TRUE ~ as.character(.)
+  ))) %>%
+  mutate(across(17:71, ~ as.numeric(.))) %>%
+  mutate(across(17:71, ~ case_when(
+    . >= 0.0000001 ~ . * 10000,  # Convert % to ppm
+    TRUE ~ .
+  ))) %>%
+  mutate(across(everything(), as.numeric))  # Ensure all values are numeric
+
+# Remove first 16 columns (no elemental data)
+data2 <- data2[, -c(1:16)]
+
+# Combine data
+data3<-cbind(data1[, c(1:16)],data2)
+
+# Calculate mean
+mean_data <- data3 %>%
+  group_by(Time) %>%
+  summarize(across(everything(), mean, na.rm = TRUE)) %>%
+  mutate(across(where(is.numeric), ~ round(., 0)))
+
+# Remove second to sixteenth columns and last column (no elemental data) but include Time and all measurement values
+data <- mean_data[, -c(2:16,71)]
+
+# Load second dataset
+data1 <- read.csv("../data_analytical/metrics_SCC_SdAR-M2_mar2025_vie.csv")
+
+# Define columns
+selected_columns <- c("Si", "Ti", "Al", "Fe", "Mn", "Mg", "Ca", "K", "P", "S", "V", "Cr", 
+                      "Ni", "Cu", "Zn", "As", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Ba", 
+                      "Pb", "Th", "U")
+
+# Loop over each selected column
+for (col in selected_columns) {
+  
+  # Extract the data for the current column by name
+  mean_val <- data[, col]  # This extracts the column by name (which is a string)
+  
+  # Dynamically get the reference value for the current column from data1 (assuming row 1 contains reference values)
+  CL <- data1[1, col]  # Reference value for the column from data1
+  
+  # Define the percentage difference function (element-wise operation)
+  percentage_difference <- function(x) {
+    return(((x - CL) / CL) * 100)  # Apply the percentage difference formula
+  }
+  
+  # Apply the percentage difference function to each element in mean_val
+  percentage_diff <- sapply(mean_val, percentage_difference)
+  
+  # Optionally, store the result in a new column in the data
+  data[, paste(col, "percentage_diff", sep = "_")] <- percentage_diff
+}
+
+# Select necessary columns, round values (except 'Time'), and remove '_percentage_diff' from column names
+data_RD <- data[, c(1, 56:81)] %>%
+  mutate(across(-which(names(.) == "Time"), round, 0)) %>%  # Round all columns except 'Time'
+  setNames(gsub("_percentage_diff", "", colnames(.))) %>%     # Remove '_percentage_diff' from column names
+  setNames(gsub("^Time$", "%RD", colnames(.)))  # Replace "Time" with "%RD"
+```
+
+##### Optional: Add empircal LOD and data mean %RD spreadsheet {#sec-RD11}
+
+If you do not want this, just scip this bit.
+
+```{r}
+# Load data
+ref_data <- read.csv("../data_analytical/metrics_SdAR-M2_mar2025_vie.csv")
+
+# Extract column headers (excluding first column, e.g., "SAMPLE")
+col_headers <- names(data_RD)[-1]
+
+# Create mean and LOD vectors matching column headers
+mean_row <- sapply(col_headers, function(el) {
+  val <- ref_data$M[ref_data$Element == el]
+  if (length(val) == 0) NA else val
+})
+
+lod_row <- sapply(col_headers, function(el) {
+  val <- ref_data$Empirical_LOD[ref_data$Element == el]
+  if (length(val) == 0) NA else val
+})
+
+# Build new data.frame with the two rows
+new_rows <- as.data.frame(rbind(mean_row, lod_row))
+new_rows <- cbind("Label" = c("Mean (ppm)", "Empirical LOD (ppm)"), new_rows)
+colnames(new_rows) <- names(data_RD)
+
+# Combine with original data
+data_RD2 <- bind_rows(new_rows, data_RD)
+
+# Round first two rows
+data_RD2[1:2, -1] <- lapply(data_RD2[1:2, -1], function(x) round(as.numeric(x), 0))
+```
+
+#### Format %RD-spreadsheet {#sec-RD2}
+
+If you did not add LOD-information, you will have to adjust this code so it does format the first rows as well. You will need the calculations from step @sec-nv to run the code.
+
+```{r}
+# Assuming data_RD2 is your dataset
+tbl <- BasicTable$new()
+tbl$addData(data_RD2, firstColumnAsRowHeaders=TRUE)
+
+# Get the number of rows and columns in the dataset
+num_rows <- nrow(data_RD2)
+num_columns <- ncol(data_RD2)
+
+# Find the index of the column with the header "%RD"
+rd_column_index <- which(names(data_RD2) == "%RD")
+
+# Define the cells for which the styling needs to be applied (excluding the '%RD' column)
+column_indices_to_style <- setdiff(2:num_columns, rd_column_index)
+
+# Ensure the last row is included in styling
+cells <- tbl$getCells(
+  rowNumbers = 4:(num_rows + 1),  
+  columnNumbers = column_indices_to_style,
+  matchMode = "combinations"
+)
+
+# Apply the styling
+tbl$mapStyling(
+  cells = cells,
+  styleProperty = "background-color",
+  valueType = "color",
+  mapType = "logic",
+  mappings = list(
+    "v >= -3 & v <= 3", "lightgreen",   # Values between -3 and 3
+    "v > -7 & v < -3", "lightblue",     # Values between -7 and -3
+    "v > 3 & v <= 7", "lightblue",      # Values between 3 and 7
+    "v > 7 & v <= 10", "yellow",        # Values between 7 and 10
+    "v >= -10 & v <= -7", "yellow",      # Values between -10 and -7
+    "v > 10", "firebrick",              # Values greater than 10
+    "v < -10", "firebrick"            # Values less than -10
+  )
+)
+
+# Render the table with the applied styles
+tbl$renderTable()
+
+# Save the table to an Excel workbook
+wb <- createWorkbook(creator = Sys.getenv("M. Schauer"))
+addWorksheet(wb, "Data")
+tbl$writeToExcelWorksheet(wb = wb, wsName = "Data", topRowNumber = 1, leftMostColumnNumber = 1, applyStyles = TRUE)
+
+# Save the workbook as an Excel file
+saveWorkbook(wb, file = "../data_analytical/Example_relRD_SdAR-M2.xlsx", overwrite = TRUE)
+```
+
+**Interpretation**: The %RD demonstrates excellent accuracy (between -3 and +3) for the elements Fe, Ni, Cu, Zn, As, Sr, Y and Nb, with some elements — Si, Ti, Al, Mn, Ca, K, S, V, Rb, Mo and Pb — also including highly accurate %RD values (3 to 7, -3 to -7). Ba shows only one %RD values of good accuracy (7 to 10, -7 to -10), Zr one exceeding this benchmark. For Mg, P, Cr and U, the %RD values are not accurate enough (higher than 10, lower than -10). Therefore, these latter elements are not measured with sufficient accuracy and should either not be used or, if used, be handled with great care in further analysis. *This table will look different depending on the data input!* It is individual for each data set.
+
+The relations visible when plotted in a scatterplot mirror those being discussed in @sec-SCC1:
+
+#### Create figures of %RD {#sec-RD3}
+
+```{r}
+#| output: false
+# Load data and exclude first column if you added LOD-information and rename column %RD to Day
+data1 <- data_RD2[-c(1, 2), ] %>%
+  rename(Day = `%RD`) %>%
+  mutate(across(-1, ~ as.numeric(.)))
+
+# Define columns
+selected_columns <- c("Si", "Ti", "Al", "Fe", "Mn", "Mg", "Ca", "K", "P", "S", "V", "Cr", 
+                      "Ni", "Cu", "Zn", "As", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Ba", 
+                      "Pb", "Th", "U")
+
+# Create a PDF file to save all plots
+pdf("../figures/Example_relRD_SdAR-M2_plots.pdf", width = 10, height = 6)
+
+# Loop through selected columns
+for (col in selected_columns) {
+  # Skip if column not in data1
+  if (!col %in% colnames(data1)) {
+    warning(paste("Skipping", col, "- not found in data1"))
+    next
+  }
+  
+  # Extract data
+  plot_data <- data.frame(
+    Day = as.factor(data1$Day),
+    Value = data1[[col]]
+  )
+  
+  # Create plot
+  p <- ggplot(plot_data, aes(x = Day, y = Value, group = 1)) +
+    geom_point() +
+    geom_line() +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+    labs(
+      title = paste("%RD-Plot for", col),
+      x = "Mean Values of SdAR-M2 of different Measurement Sessions (Days)",
+      y = col
+    ) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  
+  print(p)
+}
+
+# Close the PDF device
+dev.off()
+```
+
+**%RD plots**
+
+<iframe width="750" height="500" src="../figures/Example_relRD_SdAR-M2_plots.pdf">
+
+</iframe>
+
+## Conclusions drawn from the procedures for the example data {#sec-C}
+
+This work-flow support the evaluation of p-XRF data precision (see @sec-LOD and @sec-CV) monitoring Limits of Detection and Limits of Quantification (@sec-LOD), and Coefficient of Variation (CV; see @sec-CV) of an example dataset. Device performance (see @sec-dm) is assessed using Standard SdAR-M2 to generate reference values (see @sec-nv), which are used in the daily routine for device accuracy testing with Shewhart Control Charts (SCC; see @sec-SCC) and the Relative Percentage Difference (%RD; see @sec-RD).
+
+*Monitoring LOD, LOQ and CV for element precision*
+
+Monitoring the LOD presented by the device based on the measurement mode revealed the elements Co and Ba as clearly violating the benchmark of 20% measurement values per element below LOD with P and S needing to be monitored further (see @sec-LOD1). Having calculated empirical LOD and LOQ (see @sec-LOD2), the proportion per element of values below LOQ revealed the elements Ba, Co, Mo, Nb, U, Cr, V, As, P, Pb, Mg, Cu and S to violate the 20% benchmark, while Y needs further evaluation (see @sec-LOQ2)
+
+Evaluating the CV (see @sec-CV) the results show that the mean CV benchmark of 15% is violated by the elements P, U, Co, Ba, S and Cr. For Pb, As and Mo, the closeness to the benchmark need checking back with the monitoring results of LOD and LOQ which (see @sec-CV4), all together, make very clear that those elements also can be reliably used for interpretation of this dataset. Yet, in the case of Y, this element shows as low CV and is therefore categorised as reliable. This leaves for this dataset as reliable elements Si, Ti, Al, Fe, Mn, Ca, K, Ni, Zn, Rb, Sr, Y, Zr and Th.
+
+*Monitoring CV for sample precision*
+
+Applying the benchmark of not more then 20% of reliable elements per sample with a CV above 15%, for the example dataset six sample violate this requirement (see @sec-CV6). Therefore, these samples have to be evaluated to identify the likely cause for the high variability. Re-measurements of these samples have to be undertaken.
+
+*Control Limits, SCC and %RD for device monitoring*
+
+To assess accuracy, Control Limits were calculated for Standard SdAR-M2 (see @sec-nv), defining the mean as a reference and the upper and lower control limits (±2δSD). Based on the measurement mode and matrix to be analysed, elements representative of the variability covered by the mode (energy, peak overlap etc.) have to be selected and can further be used for on-screen daily device monitoring. In this example, using a geochemical setup with a soil standard, suitable elements include the light elements Mn, Ti, and Ca (Major), and the trace elements Rb, Zn, and Zr (Trace; (see @sec-nv3).
+
+Monitoring device performance for short-term s-drift (see @sec-SCC2) showed consistent results for all elements, with only a few measurements violating the ±2δSD benchmark yet only once or inconsistently. No clear drift was observed, and the data scatter is random, primarily within the ±2δSD range, indicating high precision in the standard measurements. Only Mg shows to high short-term drift effects. Long-term l-drift (see @sec-SCC3) showed good consistency as well, although a few more values fell outside the ±2δSD range. The value scatter mostly appears randomly distributed on either side of the mean, with little evidence of drift effects. However, for some elements, such as Fe, Mn and Zr but especially P, S and Cr, a slight drift towards lower values is visible while for Ni and Zn, the opposite seems the case.
+
+The %RD analysis (see @sec-RD) revealed that elements such as Mg, P and Cr were not measured with sufficient accuracy. The elements that demonstrated adequate accuracy include (see @sec-RD2): Fe, Ni, Cu, Zn, As, Sr, Y and Nb (excellent) as well as Si, Ti, Al, Mn, Ca, K, S, V, Rb, Mo and Pb (highly accurate).
+
+*Conclusion*
+
+Combining the investigation in precision and accuracy of the example data, the elements that are reliable for further quantitative analysis are: Si, Ti, Al, Fe, Mn, Ca, K, Ni, Zn, Rb, Sr, Y, Zr and Th. Six samples have to be checked due to too high measurement value variability. It is important to note that the reliability of these elements may vary depending on the material and sample set being analyzed.
+
+## References
+
+::: {#refs}
+:::
