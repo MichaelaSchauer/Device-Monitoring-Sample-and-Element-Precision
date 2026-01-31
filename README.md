@@ -1,4 +1,4 @@
-# Workflow and Benchmarks for Daily Device Monitoring, Sample and Element Precision Assessment in Handheld pXRF Studies
+# Device Monitoring, Sample and Element Precision for Analytical Data in handheld pXRF studies - Evaluation in R
 
 ## Overview
 
