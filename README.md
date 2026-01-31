@@ -25,7 +25,7 @@ If you use this workflow, please cite:
 
 Portable X-ray fluorescence (pXRF) has become a standard tool in archaeological science, yet robust, transparent workflows for precision assessment and routine device monitoring are often lacking.  
 
-This repository provides a reproducible and documented protocol for evaluating pXRF data quality, supporting both methodological transparency and long-term instrument control in archaeological applications.
+This repository provides a reproducible and documented protocol for evaluating pXRF data quality, supporting both methodological transparency and instrument monitoring in pXRF studies.
 
 ---
 
